@@ -579,8 +579,8 @@ podDisruptionBudget:
 
 # autoscaling is used only if mode is "deployment" or "statefulset"
 autoscaling:
-  enabled: false
-  minReplicas: 1
+  enabled: true
+  minReplicas: 2
   maxReplicas: 10
   behavior: {}
   targetCPUUtilizationPercentage: 80
