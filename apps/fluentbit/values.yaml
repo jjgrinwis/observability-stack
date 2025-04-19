@@ -261,8 +261,8 @@ autoscaling:
       # are applied during the life of a Pod. Possible values are "Off", "Initial", "Recreate", and "Auto".
       updateMode: Auto
 
-  enabled: false
-  minReplicas: 1
+  enabled: true
+  minReplicas: 2
   maxReplicas: 3
   targetCPUUtilizationPercentage: 75
   #  targetMemoryUtilizationPercentage: 75
