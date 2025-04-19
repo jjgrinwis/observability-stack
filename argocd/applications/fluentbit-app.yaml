@@ -15,9 +15,6 @@ spec:
     - repoURL: "https://github.com/jjgrinwis/observability-stack" # repo with our ingress route
       ref: values
       targetRevision: HEAD
-    - repoURL: "https://github.com/jjgrinwis/observability-stack" # repo with our ingress route
-      path: apps/fluentbit
-      targetRevision: HEAD
   destination:
     server: https://kubernetes.default.svc
     namespace: observability # Namespace where Fluent Bit will be deployed
