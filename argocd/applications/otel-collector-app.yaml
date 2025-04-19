@@ -7,7 +7,7 @@ spec:
   project: default
   sources:
     - repoURL: "https://open-telemetry.github.io/opentelemetry-helm-charts" # public repo
-      chart: fluent-bit
+      chart: opentelemetry-collector
       targetRevision: "0.122.1"
       helm:
         valueFiles:
