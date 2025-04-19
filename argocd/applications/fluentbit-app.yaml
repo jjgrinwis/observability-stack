@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: fluentbit
+  namespace: argocd
+spec:
+  project: default
+  sources:
+    - repoURL: "https://fluent.github.io/helm-charts" # public repo
+      chart: fluent-bit
+      targetRevision: "0.48.10"
+      helm:
+        valueFiles:
+          - $values/values/fluentbit/values.yaml
+    - repoURL: "https://github.com/jjgrinwis/argo-apps" # repo with helm values file
+      targetRevision: main
+      ref: values
+    - repoURL: "https://github.com/jjgrinwis/argo-apps" # repo with helm values file
+      targetRevision: main
+      path: apps
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: observability # Namespace where Fluent Bit will be deployed
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

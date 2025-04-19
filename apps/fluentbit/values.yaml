@@ -1,0 +1,844 @@
+# Default values for fluent-bit.
+
+# kind -- DaemonSet or Deployment
+kind: Deployment
+
+# replicaCount -- Only applicable if kind=Deployment
+replicaCount: 2
+
+image:
+  repository: cr.fluentbit.io/fluent/fluent-bit
+  # Overrides the image tag whose default is {{ .Chart.AppVersion }}
+  # Set to "-" to not use the default value
+  tag:
+  digest:
+  pullPolicy: IfNotPresent
+
+testFramework:
+  enabled: false
+  namespace:
+  image:
+    repository: busybox
+    pullPolicy: Always
+    tag: latest
+    digest:
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name:
+
+rbac:
+  create: true
+  nodeAccess: false
+  eventsAccess: false
+
+# Configure podsecuritypolicy
+# Ref: https://kubernetes.io/docs/concepts/policy/pod-security-policy/
+# from Kubernetes 1.25, PSP is deprecated
+# See: https://kubernetes.io/blog/2022/08/23/kubernetes-v1-25-release/#pod-security-changes
+# We automatically disable PSP if Kubernetes version is 1.25 or higher
+podSecurityPolicy:
+  create: false
+  annotations: {}
+  runAsUser:
+    rule: RunAsAny
+  seLinux:
+    # This policy assumes the nodes are using AppArmor rather than SELinux.
+    rule: RunAsAny
+
+# OpenShift-specific configuration
+openShift:
+  enabled: false
+  securityContextConstraints:
+    # Create SCC for Fluent-bit and allow use it
+    create: true
+    name: ""
+    annotations: {}
+    runAsUser:
+      type: RunAsAny
+    seLinuxContext:
+      type: MustRunAs
+    # Use existing SCC in cluster, rather then create new one
+    existingName: ""
+
+podSecurityContext: {}
+#   fsGroup: 2000
+
+hostNetwork: false
+dnsPolicy: ClusterFirst
+
+dnsConfig: {}
+#   nameservers:
+#     - 1.2.3.4
+#   searches:
+#     - ns1.svc.cluster-domain.example
+#     - my.dns.search.suffix
+#   options:
+#     - name: ndots
+#       value: "2"
+#     - name: edns0
+
+hostAliases: []
+#   - ip: "1.2.3.4"
+#     hostnames:
+#     - "foo.local"
+#     - "bar.local"
+
+securityContext: {}
+#   capabilities:
+#     drop:
+#     - ALL
+#   readOnlyRootFilesystem: true
+#   runAsNonRoot: true
+#   runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 2020
+  internalTrafficPolicy:
+  loadBalancerClass:
+  loadBalancerSourceRanges: []
+  labels: {}
+  # nodePort: 30020
+  # clusterIP: 172.16.10.1
+  annotations: {}
+  #   prometheus.io/path: "/api/v1/metrics/prometheus"
+  #   prometheus.io/port: "2020"
+  #   prometheus.io/scrape: "true"
+  externalIPs: []
+  # externalIPs:
+  #  - 2.2.2.2
+
+serviceMonitor:
+  enabled: false
+  #   namespace: monitoring
+  #   interval: 10s
+  #   scrapeTimeout: 10s
+  #   selector:
+  #    prometheus: my-prometheus
+  #  ## metric relabel configs to apply to samples before ingestion.
+  #  ##
+  #  metricRelabelings:
+  #    - sourceLabels: [__meta_kubernetes_service_label_cluster]
+  #      targetLabel: cluster
+  #      regex: (.*)
+  #      replacement: ${1}
+  #      action: replace
+  #  ## relabel configs to apply to samples after ingestion.
+  #  ##
+  #  relabelings:
+  #    - sourceLabels: [__meta_kubernetes_pod_node_name]
+  #      separator: ;
+  #      regex: ^(.*)$
+  #      targetLabel: nodename
+  #      replacement: $1
+  #      action: replace
+  #  scheme: ""
+  #  tlsConfig: {}
+
+  ## Bear in mind if you want to collect metrics from a different port
+  ## you will need to configure the new ports on the extraPorts property.
+  additionalEndpoints: []
+  # - port: metrics
+  #   path: /metrics
+  #   interval: 10s
+  #   scrapeTimeout: 10s
+  #   scheme: ""
+  #   tlsConfig: {}
+  #   # metric relabel configs to apply to samples before ingestion.
+  #   #
+  #   metricRelabelings:
+  #     - sourceLabels: [__meta_kubernetes_service_label_cluster]
+  #       targetLabel: cluster
+  #       regex: (.*)
+  #       replacement: ${1}
+  #       action: replace
+  #   # relabel configs to apply to samples after ingestion.
+  #   #
+  #   relabelings:
+  #     - sourceLabels: [__meta_kubernetes_pod_node_name]
+  #       separator: ;
+  #       regex: ^(.*)$
+  #       targetLabel: nodename
+  #       replacement: $1
+  #       action: replace
+
+prometheusRule:
+  enabled: false
+#   namespace: ""
+#   additionalLabels: {}
+#   rules:
+#   - alert: NoOutputBytesProcessed
+#     expr: rate(fluentbit_output_proc_bytes_total[5m]) == 0
+#     annotations:
+#       message: |
+#         Fluent Bit instance {{ $labels.instance }}'s output plugin {{ $labels.name }} has not processed any
+#         bytes for at least 15 minutes.
+#       summary: No Output Bytes Processed
+#     for: 15m
+#     labels:
+#       severity: critical
+
+dashboards:
+  enabled: false
+  labelKey: grafana_dashboard
+  labelValue: 1
+  annotations: {}
+  namespace: ""
+  deterministicUid: false
+
+lifecycle: {}
+#   preStop:
+#     exec:
+#       command: ["/bin/sh", "-c", "sleep 20"]
+
+livenessProbe:
+  httpGet:
+    path: /
+    port: http
+
+readinessProbe:
+  httpGet:
+    path: /api/v1/health
+    port: http
+
+resources: {}
+#   limits:
+#     cpu: 100m
+#     memory: 128Mi
+#   requests:
+#     cpu: 100m
+#     memory: 128Mi
+
+## only available if kind is Deployment
+ingress:
+  enabled: false
+  # ingressClassName: "nginx"
+  # annotations:
+  #   cert-manager.io/cluster-issuer: cert-manager-global
+  #   kubernetes.io/ingress.class: nginx
+  #   nginx.ingress.kubernetes.io/auth-type: "basic"
+  #   nginx.ingress.kubernetes.io/auth-secret: "fluent-bit-basic-auth"
+  #   nginx.ingress.kubernetes.io/auth-realm: "Authentication Required"
+  # hosts:
+  #   - host: fluent-bit.great-demo.com
+  #     port: 8888
+  # extraHosts: []
+  # # - host: fluent-bit-extra.example.tld
+  # ## specify extraPort number
+  # #   port: 5170
+  # tls:
+  #   - secretName: fluentbit-tls
+  #     hosts:
+  #       - fluent-bit.great-demo.com
+
+## only available if kind is Deployment
+autoscaling:
+  vpa:
+    enabled: false
+
+    annotations: {}
+
+    # List of resources that the vertical pod autoscaler can control. Defaults to cpu and memory
+    controlledResources: []
+
+    # Define the max allowed resources for the pod
+    maxAllowed: {}
+    # cpu: 200m
+    # memory: 100Mi
+    # Define the min allowed resources for the pod
+    minAllowed: {}
+    # cpu: 200m
+    # memory: 100Mi
+
+    updatePolicy:
+      # Specifies whether recommended updates are applied when a Pod is started and whether recommended updates
+      # are applied during the life of a Pod. Possible values are "Off", "Initial", "Recreate", and "Auto".
+      updateMode: Auto
+
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 75
+  #  targetMemoryUtilizationPercentage: 75
+  ## see https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/#autoscaling-on-multiple-metrics-and-custom-metrics
+  customRules: []
+  #     - type: Pods
+  #       pods:
+  #         metric:
+  #           name: packets-per-second
+  #         target:
+  #           type: AverageValue
+  #           averageValue: 1k
+  ## see https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/#support-for-configurable-scaling-behavior
+  behavior: {}
+#      scaleDown:
+#        policies:
+#          - type: Pods
+#            value: 4
+#            periodSeconds: 60
+#          - type: Percent
+#            value: 10
+#            periodSeconds: 60
+
+## only available if kind is Deployment
+podDisruptionBudget:
+  enabled: false
+  annotations: {}
+  maxUnavailable: "30%"
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+labels: {}
+
+annotations: {}
+
+podAnnotations: {}
+
+podLabels: {}
+
+## How long (in seconds) a pods needs to be stable before progressing the deployment
+##
+minReadySeconds:
+
+## How long (in seconds) a pod may take to exit (useful with lifecycle hooks to ensure lb deregistration is done)
+##
+terminationGracePeriodSeconds:
+
+priorityClassName: ""
+
+env: []
+#  - name: FOO
+#    value: "bar"
+
+# The envWithTpl array below has the same usage as "env", but is using the tpl function to support templatable string.
+# This can be useful when you want to pass dynamic values to the Chart using the helm argument "--set <variable>=<value>"
+# https://helm.sh/docs/howto/charts_tips_and_tricks/#using-the-tpl-function
+envWithTpl: []
+#  - name: FOO_2
+#    value: "{{ .Values.foo2 }}"
+#
+# foo2: bar2
+
+envFrom: []
+
+# This supports either a structured array or a templatable string
+extraContainers: []
+
+# Array mode
+# extraContainers:
+#   - name: do-something
+#     image: busybox
+#     command: ['do', 'something']
+
+# String mode
+# extraContainers: |-
+#   - name: do-something
+#     image: bitnami/kubectl:{{ .Capabilities.KubeVersion.Major }}.{{ .Capabilities.KubeVersion.Minor }}
+#     command: ['kubectl', 'version']
+
+flush: 1
+
+metricsPort: 2020
+
+extraPorts:
+  - port: 8888
+    containerPort: 8888
+    protocol: TCP
+    name: tcp
+    nodePort: 8888
+
+extraVolumes: []
+
+extraVolumeMounts: []
+
+updateStrategy: {}
+#   type: RollingUpdate
+#   rollingUpdate:
+#     maxUnavailable: 1
+
+# Make use of a pre-defined configmap instead of the one templated here
+existingConfigMap: ""
+
+networkPolicy:
+  enabled: false
+#   ingress:
+#     from: []
+
+luaScripts:
+  dswm.lua: |
+    -- a function to convert anything that looks like a number to a number
+    function convert_to_numbers(tag, timestamp, record)
+        local new_record = {}
+        
+        for key, value in pairs(record) do
+            -- Check if the value is a string that looks like a number
+            if type(value) == "string" and tonumber(value) then
+                new_record[key] = tonumber(value)  -- Convert to number
+            else
+                new_record[key] = value  -- Keep original value
+            end
+        end
+
+        return 1, timestamp, new_record
+    end
+
+    -- set otel severitynumber based on http status code
+    -- https://opentelemetry.io/docs/specs/otel/logs/data-model/#field-severitynumber
+    function set_severity_number(tag, timestamp, record)
+        local field_to_check = "statusCode"   
+        local status_field = "severity_number" -- loki specific field name
+
+        if record[field_to_check] then
+            local value = tonumber(record[field_to_check])  -- Convert to number
+
+            -- check http status code
+            if value and value >= 400 and value < 500 then
+                record[status_field] = 13 -- WARN
+            elseif value >= 500 and value < 600 then
+                record[status_field] = 17 -- ERROR
+            else
+                record[status_field] = 9 -- INFO
+            end
+        else
+            record[status_field] = 17  -- set to error if not set
+        end
+
+        return 1, timestamp, record
+    end
+
+    -- just for fun, set timestamp based on reqTimeSec
+    function convert_time(tag, timestamp, record)
+        local time_field = "reqTimeSec"        -- The field containing epoch time in seconds
+        local output_field = "timestamp"       -- New field for human-readable time
+
+        if record[time_field] then
+            local epoch_sec = tonumber(record[time_field])
+            if epoch_sec then
+                local formatted_time = os.date("%Y-%m-%d %H:%M:%S", epoch_sec)  -- Format time
+                record[output_field] = formatted_time  -- Add formatted time to record
+            else
+                record[output_field] = "INVALID_TIME"
+            end
+        else
+            record[output_field] = "MISSING_TIME"
+        end
+
+        return 1, timestamp, record
+    end
+
+    -- set TIMESTAMP of our event based on reqTimeSec from our MESSAGE
+    function set_timestamp(tag, timestamp, record)
+        local new_ts = record["reqTimeSec"]
+        if new_ts then
+            return 1, new_ts, record
+        end
+        return 1, timestamp, record
+    end
+
+    -- get grn from customField if it's set
+    function extract_grn(tag, timestamp, record)
+        local custom_field = record["customField"]
+        if custom_field then
+            -- Extract the value after "grn:"
+            local grn_value = custom_field:match("grn:([%x%.]*)") -- https://www.lua.org/manual/5.4/manual.html#6.4.1
+            if grn_value then
+                record["grn"] = grn_value
+            end
+        end
+        return 1, timestamp, record
+    end
+
+    -- span_ids set by random hex functionality in Akamai delivery config
+    -- we might want to change span_id to req_id if we're also logging midgress so we have multiple reqids
+    function extract_otel_ids(tag, timestamp, record)
+        local custom_field = record["customField"]
+        if custom_field then
+            local trace_id_value = custom_field:match("traceId:([%x]*)")
+            if trace_id_value then
+                record["trace_id"] = trace_id_value
+            end
+            local span_id_value = custom_field:match("spanId:([%x]*)")
+            if span_id_value then
+                record["span_id"] = span_id_value
+            end
+        end
+        return 1, timestamp, record
+    end
+      -- urldecode data
+    function urldecode(str)
+        str = str:gsub('%%(%x%x)', function(hex)
+            return string.char(tonumber(hex, 16))
+        end)
+        return str
+    end
+
+    -- create a valid trace_id from grn
+    function format_grn_to_trace_id(input_str)
+        -- Extract only hexadecimal characters using %x (matches 0-9, a-f, A-F)
+        local hex_str = input_str:gsub("[^%x]", "")
+
+        -- Left-pad with zeros if shorter than 32 characters
+        -- https://www.w3.org/TR/trace-context/#interoperating-with-existing-systems-which-use-shorter-identifiers
+        return string.rep("0", 32 - #hex_str) .. hex_str:sub(-32)
+    end
+
+    function extend_decimal(tag, timestamp, record)
+        if record["reqTimeSec"] then
+            -- Convert string to number
+            local num = tonumber(record["reqTimeSec"])
+            if num then
+                -- Format it with 6 decimal places
+                record["reqTimeSec"] = string.format("%.6f", num)
+            end
+        end
+        return 1, timestamp, record
+    end
+
+    function to_zipkin_format(tag, timestamp, record)
+        local new_record = {
+            {
+                id = record["span_id"],
+                traceId = record["trace_id"],
+                parentId = record["parent_id"],
+                name = record["reqMethod"] .. " " .. record["reqPath"],
+                timestamp =  record["reqTimeSec"] * 1000000, -- this will automatically convert it to microseconds. number
+                duration = record["downloadTime"] * 1000, -- convert to microseconds
+                kind = "CLIENT",
+                localEndpoint = {
+                    serviceName = record["reqHost"],
+                    ipv4 = record["edgeIP"],
+                    port = tonumber(record["reqPort"])
+                },
+                remoteEndpoint = {
+                    serviceName = "Gravitee backend", -- could be changed to origin hostname
+                    ipv4 = record["originIP"],
+                    port = tonumber(record["reqPort"])
+                },
+                tags = {
+                    ["http.method"] = record["reqMethod"],
+                    ["http.path"] = record["reqPath"],
+                    ["http.status"] = record["statusCode"],
+                    ["http.size"] = record["objSize"],
+                    ["akamai.grn"] = record["grn"],
+                    ["postnl.environment"] = "akamai-tst",
+                    ["postnl.contact"] = "joran"
+                }
+            }
+        }
+        return 1, timestamp, new_record
+    end
+
+    -- extra origin ip address from breadcrumb data
+    function extract_a_where_c_o(tag, timestamp, record)
+        local breadcrumbs = record["breadcrumbs"]
+        if breadcrumbs == nil then
+            return 0, 0, record
+        end
+
+        -- URL decode breadcrumbs, just in case.
+        breadcrumbs = urldecode(breadcrumbs)
+
+        -- Match the last block inside the square brackets and get address.
+        local last_bc_block = string.match(breadcrumbs, "%[([^%[]*c=o[^%[]*)%]$")
+        record["originIP"] = string.match(last_bc_block, "a=([^,]+)") or "Served directly Akamai Edge Server"
+        
+        return 1, timestamp, record
+    end
+
+    -- generate a trace format using information from datastream 
+    function generate_otel_trace(tag, timestamp, record)
+        local json = {}
+        
+        -- Adding resourceSpans
+        json["resourceSpans"] = {}
+        local resourceSpans = {}
+        
+        -- Resource Attributes
+        resourceSpans["resource"] = {}
+        resourceSpans["resource"]["attributes"] = {}
+        table.insert(resourceSpans["resource"]["attributes"], {
+            key = "service.name",
+            value = { stringValue = "Akamai - Gravitee" }
+        })
+        
+        -- Adding scopeSpans
+        resourceSpans["scopeSpans"] = {}
+        local scopeSpans = {}
+        
+        -- Scope
+        scopeSpans["scope"] = { name = "Akamai Datastream - 123" }
+        
+        -- Spans
+        scopeSpans["spans"] = {}
+        local spans = {}
+        local span = {}
+        
+        -- Span Fields
+        span["traceId"] = record["trace_id"]
+        span["spanId"] = record["span_id"]
+        span["parentSpanId"] = record["parent_id"]
+        span["flags"] = 0
+        span["name"] = record["reqMethod"] .. " " .. record["reqPath"]
+        span["kind"] = 2
+        span["startTimeUnixNano"] = msec_to_nsec(record["reqTimeSec"]) -- to nanoseconds
+        span["endTimeUnixNano"] = span["startTimeUnixNano"] + (record["downloadTime"] * 1000000)
+        
+        -- Span Attributes
+        span["attributes"] = {}
+        table.insert(span["attributes"], { key = "http.request.method", value = { stringValue = record["reqMethod"] } })
+        table.insert(span["attributes"], { key = "server.address", value = { stringValue = record["reqHost"] } })
+        table.insert(span["attributes"], { key = "client.address", value = { stringValue = record["cliIP"]} })
+        table.insert(span["attributes"], { key = "url.path", value = { stringValue = record["reqPath"] } })
+        table.insert(span["attributes"], { key = "http.response.status_code", value = { intValue = tonumber(record["statusCode"]) } })
+        table.insert(span["attributes"], { key = "http.response.body.size", value = { intValue = tonumber(record["objSize"]) } })
+        table.insert(span["attributes"], { key = "akamai.grn", value = { stringValue = record["grn"] } })
+        table.insert(span["attributes"], { key = "akamai.edgeip", value = { stringValue = record["edgeIP"] } })
+        table.insert(span["attributes"], { key = "akamai.cache_status", value = { intValue = tonumber(record["cacheStatus"]) } })
+        table.insert(span["attributes"], { key = "akamai.reqtimesec", value = { stringValue = record["reqTimeSec"] } })
+        
+        -- Span Status
+        span["status"] = { code = 1 }
+        
+        -- Add the span to the list
+        table.insert(scopeSpans["spans"], span)
+        
+        -- Add scopeSpans to resourceSpans
+        table.insert(resourceSpans["scopeSpans"], scopeSpans)
+        
+        -- Add resourceSpans to the main JSON
+        json["resourceSpans"] = { resourceSpans }
+        
+        -- Adding schema URL
+        json["schemaUrl"] = "https://opentelemetry.io/schemas/1.4.0"
+        
+        -- Return the generated JSON with 1, timestamp, and record
+        return 1, timestamp, json
+    end
+
+    function msec_to_nsec(milliseconds)
+          return milliseconds * 1000000000
+    end
+
+    -- generate an resource span using information from datastream 
+    function generate_resource_span(tag, timestamp, record)
+        
+        local resourceSpan = {}
+        
+        -- Resource Attributes
+        resourceSpan["resource"] = {}
+        resourceSpan["resource"]["attributes"] = {}
+        table.insert(resourceSpan["resource"]["attributes"], {
+            key = "service.name",
+            value = { stringValue = "Akamai - Gravitee" }
+        })
+        
+        -- Adding scopeSpans
+        resourceSpan["scopeSpans"] = {}
+        local scopeSpans = {}
+        
+        -- Scope
+        scopeSpans["scope"] = { name = "Akamai Datastream - " .. record["streamId"] }
+        
+        -- Spans
+        scopeSpans["spans"] = {}
+        local spans = {}
+        local span = {}
+        
+        -- Span Fields
+        span["traceId"] = record["trace_id"]
+        span["spanId"] = record["span_id"]
+        span["parentSpanId"] = record["parent_id"]
+        span["flags"] = 0
+        span["name"] = record["reqMethod"] .. " " .. record["reqPath"]
+        span["kind"] = 2
+        span["startTimeUnixNano"] = msec_to_nsec(record["reqTimeSec"]) -- to nanoseconds
+        span["endTimeUnixNano"] = span["startTimeUnixNano"] + (record["downloadTime"]  * 1000000)
+        
+        -- Span Attributes
+        span["attributes"] = {}
+        table.insert(span["attributes"], { key = "akamai.reqTimeSec", value = { stringValue = record["reqTimeSec"] } })
+        table.insert(span["attributes"], { key = "http.request.method", value = { stringValue = record["reqMethod"] } })
+        table.insert(span["attributes"], { key = "server.address", value = { stringValue = record["reqHost"] } })
+        table.insert(span["attributes"], { key = "client.address", value = { stringValue = record["cliIP"]} })
+        table.insert(span["attributes"], { key = "url.path", value = { stringValue = record["reqPath"] } })
+        table.insert(span["attributes"], { key = "http.response.status_code", value = { intValue = tonumber(record["statusCode"]) } })
+        table.insert(span["attributes"], { key = "http.response.body.size", value = { intValue = tonumber(record["objSize"]) } })
+        table.insert(span["attributes"], { key = "akamai.grn", value = { stringValue = record["grn"] } })
+        table.insert(span["attributes"], { key = "akamai.edgeip", value = { stringValue = record["edgeIP"] } })
+        table.insert(span["attributes"], { key = "akamai.cache_status", value = { intValue = tonumber(record["cacheStatus"]) } })
+        
+
+        -- set span status.code to 2 (Error), unset otherwise
+        if record["statusCode"] ~= nil and tonumber(record["statusCode"]) >= 500 then
+            span["status"] = { code = 2 }
+        end
+        
+        -- Add the span to the list
+        table.insert(scopeSpans["spans"], span)
+        
+        -- Add scopeSpans to resourceSpans
+        table.insert(resourceSpan["scopeSpans"], scopeSpans)
+        
+        -- Return the generated JSON with 1, timestamp, and record
+        return 1, timestamp, resourceSpan
+    end
+
+    log_buffer = {}  -- Table to store logs
+    last_flush = os.time()  -- Track last flush time
+    flush_interval = 1 -- flush after every second
+
+    function collect_traces(tag, timestamp, record)
+        -- store our received record in a buffer
+        table.insert(log_buffer, record)  
+
+        -- Check if we should flush the buffer
+        local current_time = os.time()
+        if (current_time - last_flush) >= flush_interval then
+            -- Wrap the buffered records into the resourceSpans structure
+            local batch = {
+                schemaUrl = "https://opentelemetry.io/schemas/1.4.0",
+                resourceSpans = log_buffer  -- Directly insert the buffered records into resourceSpans
+            }
+
+            -- Clear the buffer after batching
+            log_buffer = {}
+            last_flush = current_time
+
+            -- forward our modified log to the next step
+            return 1, timestamp, batch
+        else
+            -- stop processing this record, it's stored in the buffer
+            return -1, timestamp, record
+        end
+    end
+
+## https://docs.fluentbit.io/manual/administration/configuring-fluent-bit/classic-mode/configuration-file
+config:
+  ## https://docs.fluentbit.io/manual/administration/configuring-fluent-bit/classic-mode/upstream-servers
+  ## This configuration is deprecated, please use `extraFiles` instead.
+  upstream: {}
+
+  # This allows adding more files with arbitrary filenames to /fluent-bit/etc/conf by providing key/value pairs.
+  # The key becomes the filename, the value becomes the file content.
+  extraFiles:
+    fluent-bit.yaml: |
+      service:
+        flush: 1
+        log_level: debug
+        http_server: true
+        http_listen: 0.0.0.0
+        http_port: 2020
+        daemon: off
+        health_check: on
+
+      pipeline:
+        inputs:
+          - name: http
+            port: 8888
+            threaded: true
+
+            processors:
+              logs:
+                # get trace/span-ids
+                - name: lua
+                  script: /fluent-bit/scripts/dswm.lua
+                  call: extract_otel_ids
+
+                # extract grn and add as tag
+                - name: lua
+                  script: /fluent-bit/scripts/dswm.lua
+                  call: extract_grn
+                
+                # generate individual resource span
+                - name: lua
+                  script: /fluent-bit/scripts/dswm.lua
+                  call: generate_resource_span
+                
+                # generate resource spans list using buffering
+                - name: lua
+                  script: /fluent-bit/scripts/dswm.lua
+                  call: collect_traces
+
+        outputs:
+          - name: http
+            match: "*"
+            host: bindplane-gateway-agent.bindplane-agent.svc.cluster.local
+            port: 4318
+            uri: /v1/traces
+            json_date_key: false
+            format: json_stream
+
+          - name: stdout
+            match: "*"
+            format: json
+
+# The config volume is mounted by default, either to the existingConfigMap value, or the default of "fluent-bit.fullname"
+volumeMounts:
+  - name: config
+    mountPath: /fluent-bit/etc/conf
+
+daemonSetVolumes:
+  - name: varlog
+    hostPath:
+      path: /var/log
+  - name: varlibdockercontainers
+    hostPath:
+      path: /var/lib/docker/containers
+  - name: etcmachineid
+    hostPath:
+      path: /etc/machine-id
+      type: File
+
+daemonSetVolumeMounts:
+  - name: varlog
+    mountPath: /var/log
+  - name: varlibdockercontainers
+    mountPath: /var/lib/docker/containers
+    readOnly: true
+  - name: etcmachineid
+    mountPath: /etc/machine-id
+    readOnly: true
+
+command:
+  - /fluent-bit/bin/fluent-bit
+
+args:
+  - --workdir=/fluent-bit/etc
+  - --config=/fluent-bit/etc/conf/fluent-bit.yaml
+
+# This supports either a structured array or a templatable string
+initContainers: []
+
+# Array mode
+# initContainers:
+#   - name: do-something
+#     image: bitnami/kubectl:1.22
+#     command: ['kubectl', 'version']
+
+# String mode
+# initContainers: |-
+#   - name: do-something
+#     image: bitnami/kubectl:{{ .Capabilities.KubeVersion.Major }}.{{ .Capabilities.KubeVersion.Minor }}
+#     command: ['kubectl', 'version']
+
+logLevel: debug
+
+hotReload:
+  enabled: false
+  image:
+    repository: ghcr.io/jimmidyson/configmap-reload
+    tag: v0.14.0
+    digest:
+    pullPolicy: IfNotPresent
+  resources: {}
+  extraWatchVolumes: []
