@@ -3,7 +3,7 @@
 # Declare variables to be passed into your templates.
 
 nameOverride: ""
-fullnameOverride: ""
+fullnameOverride: "opentelemetry-collector"
 
 # Valid values are "daemonset", "deployment", and "statefulset".
 mode: "deployment"
@@ -206,7 +206,7 @@ alternateConfig: {}
 
 image:
   # If you want to use the core image `otel/opentelemetry-collector`, you also need to change `command.name` value to `otelcol`.
-  # changed to ghrc.io https://github.com/open-telemetry/community/issues/2641
+  # changed repo to ghrc.io https://github.com/open-telemetry/community/issues/2641
   repository: "ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-k8s"
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
