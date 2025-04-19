@@ -11,13 +11,9 @@ spec:
       targetRevision: "0.48.10"
       helm:
         valueFiles:
-          - $values/values/fluentbit/values.yaml
-    - repoURL: "https://github.com/jjgrinwis/argo-apps" # repo with helm values file
-      targetRevision: main
-      ref: values
-    - repoURL: "https://github.com/jjgrinwis/argo-apps" # repo with helm values file
-      targetRevision: main
-      path: apps
+          - apps/fluentbit/values.yaml
+    - repoURL: "https://github.com/jjgrinwis/observability-stack" # repo with our ingress route
+      path: apps/fluentbit
   destination:
     server: https://kubernetes.default.svc
     namespace: observability # Namespace where Fluent Bit will be deployed
