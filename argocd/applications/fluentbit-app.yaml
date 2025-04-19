@@ -12,7 +12,7 @@ spec:
       helm:
         valueFiles:
           - $values/apps/fluentbit/values.yaml
-    - repoURL: "https://github.com/jjgrinwis/observability-stack" # repo with our ingress route
+    - repoURL: "https://github.com/jjgrinwis/observability-stack" # repo with values
       ref: values
       targetRevision: HEAD
     - repoURL: "https://github.com/jjgrinwis/observability-stack" # repo with our ingress route
