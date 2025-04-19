@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: otel-collector
+  namespace: argocd
+spec:
+  project: default
+  sources:
+    - repoURL: "https://open-telemetry.github.io/opentelemetry-helm-charts" # public repo
+      chart: fluent-bit
+      targetRevision: "0.122.1"
+      helm:
+        valueFiles:
+          - $values/apps/otelcollector/values.yaml
+    - repoURL: "https://github.com/jjgrinwis/observability-stack" # repo with values
+      ref: values
+      targetRevision: HEAD
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: observability # Namespace where Fluent Bit will be deployed
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
