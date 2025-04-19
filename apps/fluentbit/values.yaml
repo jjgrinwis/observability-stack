@@ -772,7 +772,7 @@ config:
         outputs:
           - name: http
             match: "*"
-            host: bindplane-gateway-agent.bindplane-agent.svc.cluster.local
+            host: opentelemetry-collector
             port: 4318
             uri: /v1/traces
             json_date_key: false
