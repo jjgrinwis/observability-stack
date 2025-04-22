@@ -22,3 +22,6 @@ crash.log
 .vscode/
 .idea/
 .DS_Store
+
+# don't push and secret.yaml
+secret.*
