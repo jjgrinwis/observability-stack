@@ -11,7 +11,7 @@ spec:
     - kind: Rule
       match: Host(`fluentbit.great-demo.com`)
       services:
-        - name: fluentbit-fluent-bit
+        - name: fluent-bit
           port: 2020
       middlewares:
         - name: test-auth
