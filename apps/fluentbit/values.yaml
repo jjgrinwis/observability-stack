@@ -662,7 +662,9 @@ luaScripts:
         span["name"] = record["reqMethod"] .. " " .. record["reqPath"]
         span["kind"] = 2
         span["startTimeUnixNano"] = msec_to_nsec(record["reqTimeSec"]) -- to nanoseconds
-        span["endTimeUnixNano"] = span["startTimeUnixNano"] + (record["downloadTime"]  * 1000000)
+        -- span["endTimeUnixNano"] = span["startTimeUnixNano"] + (record["downloadTime"]  * 1000000)
+        span["endTimeUnixNano"] = span["startTimeUnixNano"] + msec_to_nsec(record["downloadTime"])
+
         
         -- Span Attributes
         span["attributes"] = {}
@@ -677,10 +679,26 @@ luaScripts:
         table.insert(span["attributes"], { key = "akamai.edgeip", value = { stringValue = record["edgeIP"] } })
         table.insert(span["attributes"], { key = "akamai.cache_status", value = { intValue = tonumber(record["cacheStatus"]) } })
         
-
         -- set span status.code to 2 (Error), unset otherwise
         if record["statusCode"] ~= nil and tonumber(record["statusCode"]) >= 500 then
             span["status"] = { code = 2 }
+        end
+
+        if record["errorCode"] and record["errorCode"] ~= "" then
+            span['events'] = {}
+
+            local event_attributes = {
+                {
+                    key = "error.code",
+                    value = { intValue = tonumber(record["statusCode"] or "500") }
+                },
+                {
+                    key = "error.message",
+                    value = { stringValue = record["errorCode"] }
+                }
+            }
+            
+            table.insert(span["events"], {time_unix_nano = span["startTimeUnixNano"], name = "error", attributes = event_attributes})
         end
         
         -- Add the span to the list
