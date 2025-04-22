@@ -626,7 +626,8 @@ luaScripts:
     end
 
     function msec_to_nsec(milliseconds)
-          return milliseconds * 1000000000
+          --return milliseconds * 1000000000
+          return milliseconds * 1000000
     end
 
     -- generate an resource span using information from datastream 
