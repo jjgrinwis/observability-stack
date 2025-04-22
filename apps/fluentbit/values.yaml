@@ -4,7 +4,7 @@
 kind: Deployment
 
 # replicaCount -- Only applicable if kind=Deployment
-replicaCount: 2
+replicaCount: 1
 
 image:
   repository: cr.fluentbit.io/fluent/fluent-bit
@@ -262,7 +262,7 @@ autoscaling:
       updateMode: Auto
 
   enabled: true
-  minReplicas: 2
+  minReplicas: 1
   maxReplicas: 3
   targetCPUUtilizationPercentage: 75
   #  targetMemoryUtilizationPercentage: 75
