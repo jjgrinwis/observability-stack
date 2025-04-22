@@ -186,6 +186,7 @@ config:
       traces:
         exporters:
           - debug
+          - otlp/honeycomb
         processors:
           - memory_limiter
           - batch
