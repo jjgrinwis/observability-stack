@@ -788,14 +788,6 @@ config:
                   call: collect_traces
 
         outputs:
-          - name: http
-            match: "*"
-            host: opentelemetry-collector
-            port: 4318
-            uri: /v1/traces
-            json_date_key: false
-            format: json_stream
-
           - name: stdout
             match: "*"
             format: json
