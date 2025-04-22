@@ -132,6 +132,11 @@ config:
       headers:
         x-honeycomb-team: ${API_KEY}
       timeout: 10s
+    otlphttp:/splunk:
+      traces_endpoint: https://ingest.eu0.signalfx.com:443/v2/trace/otlp
+      headers:
+        "X-SF-TOKEN": ${SPLUNK_ACCESS_TOKEN} # Example custom header for authentication
+      timeout: 10s
 
   extensions:
     # The health_check extension is mandatory for this chart.
@@ -285,6 +290,11 @@ extraEnvs:
     valueFrom:
       secretKeyRef:
         name: honeycomb-api-key
+        key: API_KEY
+  - name: SPLUNK_ACCESS_TOKEN
+    valueFrom:
+      secretKeyRef:
+        name: splunk-api-key
         key: API_KEY
 
 extraEnvsFrom: []
