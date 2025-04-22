@@ -12,7 +12,7 @@ spec:
       match: Host(`fluentbit.great-demo.com`)
       services:
         - name: fluent-bit
-          port: 2020
+          port: 8888
       middlewares:
         - name: test-auth
   tls:
