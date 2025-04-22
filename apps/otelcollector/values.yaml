@@ -2,6 +2,10 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+apiKeySecret:
+  name: honeycomb-api-secret
+  key: api-key
+
 nameOverride: ""
 fullnameOverride: "opentelemetry-collector"
 
@@ -127,6 +131,11 @@ internalTelemetryViaOTLP:
 config:
   exporters:
     debug: { verbosity: detailed }
+    otlp/honeycomb:
+      endpoint: api.honeycomb.io:443
+      headers:
+        x-honeycomb-team: ${API_KEY}
+      timeout: 10s
 
   extensions:
     # The health_check extension is mandatory for this chart.
@@ -271,10 +280,16 @@ tolerations: []
 affinity: {}
 topologySpreadConstraints: []
 
-# Allows for pod scheduler prioritisation
+# Allows for pod scheduler prioritisatio
 priorityClassName: ""
 
-extraEnvs: []
+extraEnvs:
+  - name: API_KEY
+    valueFrom:
+      secretKeyRef:
+        name: otel-api-key
+        key: API_KEY
+
 extraEnvsFrom: []
 # This also supports template content, which will eventually be converted to yaml.
 extraVolumes: []
