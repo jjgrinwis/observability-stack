@@ -7,4 +7,4 @@ spec:
   basicAuth:
     realm: MyRealm
     removeHeader: true
-    secret: secretName
+    secret: authsecret
