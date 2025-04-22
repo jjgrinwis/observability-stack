@@ -13,5 +13,7 @@ spec:
       services:
         - name: fluentbit-fluent-bit
           port: 2020
+      middlewares:
+        - name: test-auth
   tls:
     certResolver: letsencrypt
