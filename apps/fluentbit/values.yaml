@@ -565,16 +565,16 @@ luaScripts:
         
         -- Resource Attributes
         resourceSpans["resource"] = {}
-        table.insert(resourceSpans["resource"], {
-           key = "deployment.environment.name",
-           value = { stringValue = "akamai-tst" }
-        })
-
+      
         -- separate attribues in resource
         resourceSpans["resource"]["attributes"] = {}
         table.insert(resourceSpans["resource"]["attributes"], {
             key = "service.name",
             value = { stringValue = "Akamai - Edge" }
+        })
+        table.insert(resourceSpans["resource"]["attributes"], {
+            key = "deployment.environment.name",
+            value = { stringValue = "Akamai - tst" }
         })
         
 
