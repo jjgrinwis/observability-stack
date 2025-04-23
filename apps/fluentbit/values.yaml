@@ -568,7 +568,7 @@ luaScripts:
       
         -- separate attributes in resource
         resourceSpans["resource"]["attributes"] = {}
-        table.insert(resourceSpans["resource"]["attributes"], { key = "deployment.environment.name", value = { stringValue = "Akamai - Edge" }})
+        table.insert(resourceSpans["resource"]["attributes"], { key = "service.name", value = { stringValue = "Akamai - Edge - 1" }})
 
         -- Adding scopeSpans
         resourceSpans["scopeSpans"] = {}
@@ -639,7 +639,7 @@ luaScripts:
         resourceSpan["resource"]["attributes"] = {}
         table.insert(resourceSpan["resource"]["attributes"], {
             key = "service.name",
-            value = { stringValue = "Akamai Edge" }
+            value = { stringValue = "Akamai Edge - 2" }
         })
         
         -- Adding scopeSpans
