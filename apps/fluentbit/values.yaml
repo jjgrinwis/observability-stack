@@ -569,6 +569,8 @@ luaScripts:
         -- separate attributes in resource
         resourceSpans["resource"]["attributes"] = {}
         table.insert(resourceSpans["resource"]["attributes"], { key = "service.name", value = { stringValue = "Akamai - Edge" }})
+        table.insert(resourceSpans["resource"]["attributes"], { key = "service.name2", value = { stringValue = "Akamai - Edge2" }})
+        
         
         -- Adding scopeSpans
         resourceSpans["scopeSpans"] = {}
