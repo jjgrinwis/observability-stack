@@ -566,12 +566,17 @@ luaScripts:
         -- Resource Attributes
         resourceSpans["resource"] = {}
         resourceSpans["resource"]["deployment.environment.name"] = "production"
+
+        
+        -- separate attribues in resource
         resourceSpans["resource"]["attributes"] = {}
         table.insert(resourceSpans["resource"]["attributes"], {
             key = "service.name",
-            value = { stringValue = "Akamai - Gravitee" }
+            value = { stringValue = "Akamai - Edge }
         })
         
+
+
         -- Adding scopeSpans
         resourceSpans["scopeSpans"] = {}
         local scopeSpans = {}
