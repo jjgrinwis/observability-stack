@@ -641,6 +641,10 @@ luaScripts:
             key = "service.name",
             value = { stringValue = "Akamai Edge - 2" }
         })
+        table.insert(resourceSpan["resource"]["attributes"], {
+            key = "deployment.environment.name:",
+            value = { stringValue = "Akamai Edge - 3" }
+        })
         
         -- Adding scopeSpans
         resourceSpan["scopeSpans"] = {}
