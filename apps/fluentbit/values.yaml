@@ -603,7 +603,7 @@ luaScripts:
         
         -- Span Attributes
         span["attributes"] = {}
-        table.insert(span["attributes"], { key = "akamai.reqTimeSec", value = { stringValue = record["reqTimeSec"] } })
+        table.insert(span["attributes"], { key = "akamai.reqTimeSec", value = { intValue = tonumber(record["reqTimeSec"]) } })
         table.insert(span["attributes"], { key = "http.request.method", value = { stringValue = record["reqMethod"] } })
         table.insert(span["attributes"], { key = "server.address", value = { stringValue = record["reqHost"] } })
         table.insert(span["attributes"], { key = "client.address", value = { stringValue = record["cliIP"]} })
@@ -659,7 +659,7 @@ luaScripts:
         if (current_time - last_flush) >= flush_interval then
             -- Wrap the buffered records into the resourceSpans structure
             local batch = {
-                schemaUrl = "https://opentelemetry.io/schemas/1.4.0",
+                SchemaURL= "https://opentelemetry.io/schemas/1.4.0",
                 resourceSpans = log_buffer  -- Directly insert the buffered records into resourceSpans
             }
 
