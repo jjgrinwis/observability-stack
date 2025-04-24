@@ -564,8 +564,11 @@ luaScripts:
     function generate_resource_span(tag, timestamp, record)
         
         local resourceSpan = {}
+
+        -- Set schemaUrl at the top level of this resourceSpan
+        resourceSpan["schemaUrl"] = "https://opentelemetry.io/schemas/1.4.0"
         
-        -- Resource Attributes
+        -- Resource Attributes of resourceSpan
         resourceSpan["resource"] = {}
         resourceSpan["resource"]["attributes"] = {}
         table.insert(resourceSpan["resource"]["attributes"], {
@@ -573,7 +576,7 @@ luaScripts:
             value = { stringValue = "Akamai Edge" }
         })
         table.insert(resourceSpan["resource"]["attributes"], {
-            key = "deployment.environment.name:",
+            key = "deployment.environment.name",
             value = { stringValue = "Akamai-tst" }
         })
         
@@ -659,7 +662,6 @@ luaScripts:
         if (current_time - last_flush) >= flush_interval then
             -- Wrap the buffered records into the resourceSpans structure
             local batch = {
-                SchemaURL = "https://opentelemetry.io/schemas/1.4.0",
                 resourceSpans = log_buffer  -- Directly insert the buffered records into resourceSpans
             }
 
