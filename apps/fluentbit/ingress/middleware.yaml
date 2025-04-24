@@ -5,6 +5,6 @@ metadata:
   name: test-auth
 spec:
   basicAuth:
-    realm: MyRealm
+    realm: "Datastream API"
     removeHeader: true
     secret: authsecret
