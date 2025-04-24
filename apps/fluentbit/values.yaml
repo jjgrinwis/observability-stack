@@ -376,7 +376,7 @@ networkPolicy:
 
 luaScripts:
   dswm.lua: |
-         -- get grn from customField if it's set
+    -- get grn from customField if it's set
     function extract_grn(tag, timestamp, record)
         local custom_field = record["customField"]
         if custom_field then
@@ -413,7 +413,7 @@ luaScripts:
         end)
         return str
     end
-  
+
     function msec_to_nsec(milliseconds)
           --return milliseconds * 1000000000
           return milliseconds * 1000000
