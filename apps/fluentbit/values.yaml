@@ -659,7 +659,7 @@ luaScripts:
         if (current_time - last_flush) >= flush_interval then
             -- Wrap the buffered records into the resourceSpans structure
             local batch = {
-                SchemaURL= "https://opentelemetry.io/schemas/1.4.0",
+                SchemaURL = "https://opentelemetry.io/schemas/1.4.0",
                 resourceSpans = log_buffer  -- Directly insert the buffered records into resourceSpans
             }
 
