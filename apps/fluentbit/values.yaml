@@ -376,76 +376,7 @@ networkPolicy:
 
 luaScripts:
   dswm.lua: |
-    -- a function to convert anything that looks like a number to a number
-    function convert_to_numbers(tag, timestamp, record)
-        local new_record = {}
-        
-        for key, value in pairs(record) do
-            -- Check if the value is a string that looks like a number
-            if type(value) == "string" and tonumber(value) then
-                new_record[key] = tonumber(value)  -- Convert to number
-            else
-                new_record[key] = value  -- Keep original value
-            end
-        end
-
-        return 1, timestamp, new_record
-    end
-
-    -- set otel severitynumber based on http status code
-    -- https://opentelemetry.io/docs/specs/otel/logs/data-model/#field-severitynumber
-    function set_severity_number(tag, timestamp, record)
-        local field_to_check = "statusCode"   
-        local status_field = "severity_number" -- loki specific field name
-
-        if record[field_to_check] then
-            local value = tonumber(record[field_to_check])  -- Convert to number
-
-            -- check http status code
-            if value and value >= 400 and value < 500 then
-                record[status_field] = 13 -- WARN
-            elseif value >= 500 and value < 600 then
-                record[status_field] = 17 -- ERROR
-            else
-                record[status_field] = 9 -- INFO
-            end
-        else
-            record[status_field] = 17  -- set to error if not set
-        end
-
-        return 1, timestamp, record
-    end
-
-    -- just for fun, set timestamp based on reqTimeSec
-    function convert_time(tag, timestamp, record)
-        local time_field = "reqTimeSec"        -- The field containing epoch time in seconds
-        local output_field = "timestamp"       -- New field for human-readable time
-
-        if record[time_field] then
-            local epoch_sec = tonumber(record[time_field])
-            if epoch_sec then
-                local formatted_time = os.date("%Y-%m-%d %H:%M:%S", epoch_sec)  -- Format time
-                record[output_field] = formatted_time  -- Add formatted time to record
-            else
-                record[output_field] = "INVALID_TIME"
-            end
-        else
-            record[output_field] = "MISSING_TIME"
-        end
-
-        return 1, timestamp, record
-    end
-
-    -- set TIMESTAMP of our event based on reqTimeSec from our MESSAGE
-    function set_timestamp(tag, timestamp, record)
-        local new_ts = record["reqTimeSec"]
-        if new_ts then
-            return 1, new_ts, record
-        end
-        return 1, timestamp, record
-    end
-
-    -- get grn from customField if it's set
+         -- get grn from customField if it's set
     function extract_grn(tag, timestamp, record)
         local custom_field = record["customField"]
         if custom_field then
@@ -474,6 +405,7 @@ luaScripts:
         end
         return 1, timestamp, record
     end
+
       -- urldecode data
     function urldecode(str)
         str = str:gsub('%%(%x%x)', function(hex)
@@ -481,80 +413,7 @@ luaScripts:
         end)
         return str
     end
-
-    -- create a valid trace_id from grn
-    function format_grn_to_trace_id(input_str)
-        -- Extract only hexadecimal characters using %x (matches 0-9, a-f, A-F)
-        local hex_str = input_str:gsub("[^%x]", "")
-
-        -- Left-pad with zeros if shorter than 32 characters
-        -- https://www.w3.org/TR/trace-context/#interoperating-with-existing-systems-which-use-shorter-identifiers
-        return string.rep("0", 32 - #hex_str) .. hex_str:sub(-32)
-    end
-
-    function extend_decimal(tag, timestamp, record)
-        if record["reqTimeSec"] then
-            -- Convert string to number
-            local num = tonumber(record["reqTimeSec"])
-            if num then
-                -- Format it with 6 decimal places
-                record["reqTimeSec"] = string.format("%.6f", num)
-            end
-        end
-        return 1, timestamp, record
-    end
-
-    function to_zipkin_format(tag, timestamp, record)
-        local new_record = {
-            {
-                id = record["span_id"],
-                traceId = record["trace_id"],
-                parentId = record["parent_id"],
-                name = record["reqMethod"] .. " " .. record["reqPath"],
-                timestamp =  record["reqTimeSec"] * 1000000, -- this will automatically convert it to microseconds. number
-                duration = record["downloadTime"] * 1000, -- convert to microseconds
-                kind = "CLIENT",
-                localEndpoint = {
-                    serviceName = record["reqHost"],
-                    ipv4 = record["edgeIP"],
-                    port = tonumber(record["reqPort"])
-                },
-                remoteEndpoint = {
-                    serviceName = "Gravitee backend", -- could be changed to origin hostname
-                    ipv4 = record["originIP"],
-                    port = tonumber(record["reqPort"])
-                },
-                tags = {
-                    ["http.method"] = record["reqMethod"],
-                    ["http.path"] = record["reqPath"],
-                    ["http.status"] = record["statusCode"],
-                    ["http.size"] = record["objSize"],
-                    ["akamai.grn"] = record["grn"],
-                    ["postnl.environment"] = "akamai-tst",
-                    ["postnl.contact"] = "joran"
-                }
-            }
-        }
-        return 1, timestamp, new_record
-    end
-
-    -- extra origin ip address from breadcrumb data
-    function extract_a_where_c_o(tag, timestamp, record)
-        local breadcrumbs = record["breadcrumbs"]
-        if breadcrumbs == nil then
-            return 0, 0, record
-        end
-
-        -- URL decode breadcrumbs, just in case.
-        breadcrumbs = urldecode(breadcrumbs)
-
-        -- Match the last block inside the square brackets and get address.
-        local last_bc_block = string.match(breadcrumbs, "%[([^%[]*c=o[^%[]*)%]$")
-        record["originIP"] = string.match(last_bc_block, "a=([^,]+)") or "Served directly Akamai Edge Server"
-        
-        return 1, timestamp, record
-    end
-
+  
     function msec_to_nsec(milliseconds)
           --return milliseconds * 1000000000
           return milliseconds * 1000000
