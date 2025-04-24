@@ -376,6 +376,28 @@ networkPolicy:
 
 luaScripts:
   dswm.lua: |
+    -- first define reqHosts we would like to process
+    local allowed_values = {
+        ["test.hostname.net"] = true,
+        ["test2.hostname.net"] = true,
+        ["api-sandbox.postnl.nl"] = true
+    }
+
+    -- our lua script to filter on hostnames we would like to process
+    function filter_on_hostname(tag, timestamp, record)
+
+        local field_value = record["reqHost"]
+
+        -- Check if the field exists and is in the allowed set
+        -- using a set for faster lookups, no need to go over a list
+        if field_value and allowed_values[field_value] then
+            return 1, timestamp, record 
+        end
+
+        return -1, 0, nil  -- Drop the record, not going to process this one.
+    end
+
+
     -- get grn from customField if it's set
     function extract_grn(tag, timestamp, record)
         local custom_field = record["customField"]
@@ -563,6 +585,11 @@ config:
 
             processors:
               logs:
+                # only start on certain hostnames
+                - name: lua
+                  script: /fluent-bit/scripts/dswm.lua
+                  call: filter_on_hostname
+
                 # get trace/span-ids
                 - name: lua
                   script: /fluent-bit/scripts/dswm.lua
