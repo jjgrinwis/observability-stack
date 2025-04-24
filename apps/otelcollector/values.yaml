@@ -135,7 +135,7 @@ config:
     otlphttp/splunk:
       traces_endpoint: https://ingest.eu0.signalfx.com:443/v2/trace/otlp
       headers:
-        "X-SF-TOKEN": ${SPLUNK_ACCESS_TOKEN} # Example custom header for authentication
+        X-SF-TOKEN: ${SPLUNK_ACCESS_TOKEN} # Example custom header for authentication
       timeout: 10s
 
   extensions:
@@ -192,6 +192,7 @@ config:
         exporters:
           - debug
           - otlp/honeycomb
+          # - otlphttp/splunk
         processors:
           - memory_limiter
           - batch
