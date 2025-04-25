@@ -15,6 +15,9 @@ spec:
     - repoURL: "https://github.com/jjgrinwis/observability-stack" # repo with values
       ref: values
       targetRevision: HEAD
+    - repoURL: "https://github.com/jjgrinwis/observability-stack" # repo with our sealed secrets
+      path: apps/otelcollector/secrets
+      targetRevision: HEAD
   destination:
     server: https://kubernetes.default.svc
     namespace: observability # Namespace where Fluent Bit will be deployed
