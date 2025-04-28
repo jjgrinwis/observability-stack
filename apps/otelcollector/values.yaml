@@ -140,7 +140,7 @@ config:
     otlphttp/granafa:
       endpoint: https://otlp-gateway-prod-eu-west-0.grafana.net/otlp
       headers:
-        Authorization: "Basic NDM0MjAxOmdsY19leUp2SWpvaU56QTRNakV6SWl3aWJpSTZJbk4wWVdOckxUUXpOREl3TVMxdmRHeHdMWGR5YVhSbExXRjFkRzh0WTNKbFlYUmxaQ0lzSW1zaU9pSTRObVZJT1RBd1YyMUtUbkV3WkhSYVdqUnRNbWhPTmpRaUxDSnRJanA3SW5JaU9pSmxkU0o5ZlE9PQ==" # Example custom header for authentication
+        Authorization: "Basic ${GRAFANA_BASIC_AUTH_TOKEN}" # Example custom header for authentication
       timeout: 10s
 
   extensions:
