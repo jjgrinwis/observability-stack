@@ -137,6 +137,11 @@ config:
       headers:
         X-SF-TOKEN: ${SPLUNK_ACCESS_TOKEN} # Example custom header for authentication
       timeout: 10s
+    otlphttp/granafa:
+      endpoint: https://otlp-gateway-prod-eu-west-0.grafana.net/otlp
+      headers:
+        Authorization: Basic ${GRAFANA_BASIC_AUTH_HEADER} # Example custom header for authentication
+    timeout: 10s
 
   extensions:
     # The health_check extension is mandatory for this chart.
@@ -177,7 +182,8 @@ config:
             scrape_interval: 10s
             static_configs:
               - targets:
-                  - ${env:MY_POD_IP}:8888
+                  # - ${env:MY_POD_IP}:8888
+                  - fluent-bit:2020 # for now only checking fluent-bit metrics
     zipkin:
       endpoint: ${env:MY_POD_IP}:9411
   service:
@@ -198,6 +204,15 @@ config:
           - batch
         receivers:
           - otlp
+        service:
+      metrics:
+        receivers:
+          - prometheus # prometheus receiver used to collect metrics
+        processors:
+          - memory_limiter
+          - batch
+        exporters:
+          - otlphttp/granafa # using grafana cloud for our metrics from prometheus
 
 # Helm currently has an issue (https://github.com/helm/helm/pull/12879) when using null to remove
 # default configuration from a subchart. The result is that you cannot remove default configuration
@@ -297,6 +312,11 @@ extraEnvs:
       secretKeyRef:
         name: splunk-api-key
         key: API_KEY
+  - name: GRAFANA_BASIC_AUTH_HEADER
+    valueFrom:
+      secretKeyRef:
+        name: grafana-cloud-basic-auth
+        key: BASIC_AUTH_HEADER
 
 extraEnvsFrom: []
 # This also supports template content, which will eventually be converted to yaml.
