@@ -178,7 +178,8 @@ config:
     prometheus:
       config:
         scrape_configs:
-          - job_name: opentelemetry-collector
+          - job_name: fluent-bit-opentelemetry-collector # create different jobs for different configs
+            metrics_path: /api/v1/metrics/prometheus
             scrape_interval: 10s
             static_configs:
               - targets:
