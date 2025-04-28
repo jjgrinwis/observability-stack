@@ -140,7 +140,7 @@ config:
     otlphttp/granafa:
       endpoint: https://otlp-gateway-prod-eu-west-0.grafana.net/otlp
       headers:
-        Authorization: "Basic ${GRAFANA_BASIC_AUTH_HEADER}" # Example custom header for authentication
+        Authorization: "Basic ${BASIC_AUTH_HEADER}" # Example custom header for authentication
       timeout: 10s
 
   extensions:
@@ -311,7 +311,7 @@ extraEnvs:
       secretKeyRef:
         name: splunk-api-key
         key: API_KEY
-  - name: GRAFANA_BASIC_AUTH_HEADER
+  - name: BASIC_AUTH_HEADER
     valueFrom:
       secretKeyRef:
         name: grafana-cloud-basic-auth
