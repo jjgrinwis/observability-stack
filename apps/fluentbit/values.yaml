@@ -570,7 +570,7 @@ config:
     fluent-bit.yaml: |
       service:
         flush: 1
-        log_level: debug
+        log_level: warn
         http_server: true
         http_listen: 0.0.0.0
         http_port: 2020
