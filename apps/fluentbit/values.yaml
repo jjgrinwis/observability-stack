@@ -619,9 +619,9 @@ config:
             json_date_key: false
             format: json_stream
 
-          - name: stdout
-            match: "*"
-            format: json
+          # - name: stdout
+          #   match: "*"
+          #   format: json
 
 # The config volume is mounted by default, either to the existingConfigMap value, or the default of "fluent-bit.fullname"
 volumeMounts:
