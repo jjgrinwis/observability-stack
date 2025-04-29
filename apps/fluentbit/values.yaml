@@ -428,13 +428,26 @@ luaScripts:
         return 1, timestamp, record
     end
 
-      -- urldecode data
+    -- urldecode data
     function urldecode(str)
         str = str:gsub('%%(%x%x)', function(hex)
             return string.char(tonumber(hex, 16))
         end)
         return str
     end
+
+    -- for whatever reason datastream is stripping the root / from the path, let's fix that.
+    function normalize_path(tag, timestamp, record)
+        local path = record["reqPath"]
+
+        if path == "-" then
+            record["reqPath"] = "/"
+        elseif path ~= nil and path ~= "" and path:sub(1, 1) ~= "/" then
+            record["reqPath"] = "/" .. path
+        end
+
+        return 1, timestamp, record
+    end 
 
     function msec_to_nsec(milliseconds)
           return milliseconds * 1000000000
@@ -599,6 +612,11 @@ config:
                 - name: lua
                   script: /fluent-bit/scripts/dswm.lua
                   call: extract_grn
+
+                # # fix missing / in reqPath
+                - name: lua
+                  script: /fluent-bit/scripts/dswm.lua
+                  call: normalize_path
                 
                 # generate individual resource span
                 - name: lua
