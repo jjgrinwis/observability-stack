@@ -508,9 +508,9 @@ luaScripts:
         table.insert(span["attributes"], { key = "http.response.status_code", value = { intValue = tonumber(record["statusCode"]) } })
         table.insert(span["attributes"], { key = "http.response.body.size", value = { intValue = tonumber(record["objSize"]) } })
         table.insert(span["attributes"], { key = "akamai.grn", value = { stringValue = record["grn"] } })
-        table.insert(span["attributes"], { key = "akamai.edgeip", value = { stringValue = record["edgeIP"] } })
+        table.insert(span["attributes"], { key = "akamai.edge_ip", value = { stringValue = record["edgeIP"] } })
         table.insert(span["attributes"], { key = "akamai.cache_status", value = { intValue = tonumber(record["cacheStatus"]) } })
-        table.insert(span["attributes"], { key = "akamai.download_time", value = { stringValue = record["downloadTime"] } })
+        table.insert(span["attributes"], { key = "akamai.download_time", value = { intValue = tonumber(record["downloadTime"]) } })
         
         -- set span status.code to 2 (Error), unset otherwise
         if record["statusCode"] ~= nil and tonumber(record["statusCode"]) >= 500 then
