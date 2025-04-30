@@ -197,7 +197,7 @@ config:
     pipelines:
       traces:
         exporters:
-          - debug
+          # - debug
           - otlp/honeycomb
           - otlphttp/splunk
         processors:
