@@ -517,7 +517,8 @@ luaScripts:
             span["status"] = { code = 2 }
         end
 
-        if record["errorCode"] and record["errorCode"] ~= "" then
+        # errorCode will be "-"" when empty
+        if record["errorCode"] and record["errorCode"] ~= "-" then
             span['events'] = {}
 
             local event_attributes = {
