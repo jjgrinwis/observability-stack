@@ -512,19 +512,15 @@ luaScripts:
         table.insert(span["attributes"], { key = "akamai.cache_status", value = { intValue = tonumber(record["cacheStatus"]) } })
         table.insert(span["attributes"], { key = "akamai.download_time", value = { intValue = tonumber(record["downloadTime"]) } })
         
-        -- set span status.code to 2 (Error), unset otherwise
+        -- set span status.code to 2 (Error), unset otherwise. This is the default for server spans
         if record["statusCode"] ~= nil and tonumber(record["statusCode"]) >= 500 then
             span["status"] = { code = 2 }
-        end
-
-        -- errorCode will be - when empty
-        if record["errorCode"] and record["errorCode"] ~= "-" then
             span['events'] = {}
 
             local event_attributes = {
                 {
                     key = "error.code",
-                    value = { intValue = tonumber(record["statusCode"] or "500") }
+                    value = { intValue = tonumber(record["statusCode"] or 500) }
                 },
                 {
                     key = "error.message",
