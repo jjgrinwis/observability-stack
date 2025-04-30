@@ -599,10 +599,10 @@ config:
 
             processors:
               logs:
-                # # only start on certain hostnames (disabled for now, filtered in datastream config)
-                # - name: lua
-                #   script: /fluent-bit/scripts/dswm.lua
-                #   call: filter_on_hostname
+                # only start on certain hostnames (should be done in delivery config)
+                - name: lua
+                  script: /fluent-bit/scripts/dswm.lua
+                  call: filter_on_hostname
 
                 # get trace/span-ids
                 - name: lua
