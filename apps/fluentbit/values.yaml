@@ -519,7 +519,7 @@ luaScripts:
         -- Only add event names that are calculated from start time, so don't add turnAroundTimeMSec for example as that's started after reqEndTimeMSec
         -- possible options: tlsOverheadTimeMSec, reqEndTimeMSec, timeToFirstByte, transferTimeMSec, downloadTime
        span["events"] = {}
-       local eventNames = {"tlsOverheadTimeMSec", "reqEndTimeMSec", "timeToFirstByte", "transferTimeMSec", "downloadTime"}
+       local eventNames = {"tlsOverheadTimeMSec", "reqEndTimeMSec", "timeToFirstByte", "transferTimeMSec"}
 
         for _, event in ipairs(eventNames) do
             if record[event] and record[event] ~= "-" then
