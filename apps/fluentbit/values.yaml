@@ -501,7 +501,7 @@ luaScripts:
         -- span["endTimeUnixNano"] = span["startTimeUnixNano"] + msec_to_nsec(record["downloadTime"])
 
         
-        -- Span Attributes
+        -- Span Attributes which should be provided via datastream
         span["attributes"] = {}
         table.insert(span["attributes"], { key = "akamai.reqTimeSec", value = { intValue = tonumber(record["reqTimeSec"]*1000) } })
         table.insert(span["attributes"], { key = "http.request.method", value = { stringValue = record["reqMethod"] } })
@@ -514,12 +514,16 @@ luaScripts:
         table.insert(span["attributes"], { key = "akamai.edge_ip", value = { stringValue = record["edgeIP"] } })
         table.insert(span["attributes"], { key = "akamai.cache_status", value = { intValue = tonumber(record["cacheStatus"]) } })
         -- table.insert(span["attributes"], { key = "akamai.download_time", value = { intValue = tonumber(record["downloadTime"]) } })
+        table.insert(span["attributes"], { key = "akamai.turnaround_time", value = { intValue = tonumber(record["turnAroundTimeMSec"]) } })
+        table.insert(span["attributes"], { key = "akamai.transfer_time", value = { intValue = tonumber(record["transferTimeMSec"]) } })
 
-        -- Span Events filled with some timers without any attributes. 
+        -- Span Events filled with some timers without any attributes.
+        -- events have a time associated with the moment when they are added to the Span 
         -- Only add event names that are calculated from start time, so don't add turnAroundTimeMSec for example as that's started after reqEndTimeMSec
-        -- possible options: tlsOverheadTimeMSec, reqEndTimeMSec, timeToFirstByte, transferTimeMSec, downloadTime
+        -- same for transferTimeMSec as it's not calculated from startTime
+        -- possible options: tlsOverheadTimeMSec, reqEndTimeMSec, timeToFirstByte, downloadTime
        span["events"] = {}
-       local eventNames = {"tlsOverheadTimeMSec", "reqEndTimeMSec", "timeToFirstByte", "transferTimeMSec"}
+       local eventNames = {"tlsOverheadTimeMSec", "reqEndTimeMSec", "timeToFirstByte"}
 
         for _, event in ipairs(eventNames) do
             if record[event] and record[event] ~= "-" then
