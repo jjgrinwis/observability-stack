@@ -449,9 +449,12 @@ luaScripts:
         return 1, timestamp, record
     end 
 
+    function sec_to_nsec(seconds)
+        return nanoseconds * 1000000000
+    end
+
     function msec_to_nsec(milliseconds)
-          return milliseconds * 1000000000
-          -- return milliseconds * 1000000
+        return nanoseconds * 1000000
     end
 
     -- generate a resource span using information from datastream 
@@ -493,8 +496,8 @@ luaScripts:
         span["flags"] = 0
         span["name"] = record["reqMethod"] .. " " .. record["reqPath"]
         span["kind"] = 2
-        span["startTimeUnixNano"] = msec_to_nsec(record["reqTimeSec"]) -- to nanoseconds
-        span["endTimeUnixNano"] = span["startTimeUnixNano"] + (record["downloadTime"]  * 1000000)
+        span["startTimeUnixNano"] = sec_to_nsec(record["reqTimeSec"]) -- to nanoseconds
+        span["endTimeUnixNano"] = span["startTimeUnixNano"] + msec_to_nsec(record["downloadTime"] )
         -- span["endTimeUnixNano"] = span["startTimeUnixNano"] + msec_to_nsec(record["downloadTime"])
 
         
