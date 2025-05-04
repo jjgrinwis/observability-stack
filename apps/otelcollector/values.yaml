@@ -300,16 +300,16 @@ clusterRole:
   name: ""
   # A set of rules as documented here : https://kubernetes.io/docs/reference/access-authn-authz/rbac/
   # Can be used in combination with presets that create a cluster role to add additional rules.
-  rules: []
-  # - apiGroups:
-  #   - ''
-  #   resources:
-  #   - 'pods'
-  #   - 'nodes'
-  #   verbs:
-  #   - 'get'
-  #   - 'list'
-  #   - 'watch'
+  rules:
+    - apiGroups:
+        - ""
+      resources:
+        - "pods"
+        - "nodes"
+      verbs:
+        - "get"
+        - "list"
+        - "watch"
 
   clusterRoleBinding:
     # Annotations to add to the clusterRoleBinding
