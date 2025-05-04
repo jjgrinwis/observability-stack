@@ -290,7 +290,7 @@ clusterRole:
   # Specifies whether a clusterRole should be created
   # Some presets also trigger the creation of a cluster role and cluster role binding.
   # If using one of those presets, this field is no-op.
-  create: false
+  create: true
   # Annotations to add to the clusterRole
   # Can be used in combination with presets that create a cluster role.
   annotations: {}
