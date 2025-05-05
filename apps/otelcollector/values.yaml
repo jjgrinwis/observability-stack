@@ -175,20 +175,50 @@ config:
         http:
           endpoint: ${env:MY_POD_IP}:4318
     # if internalTelemetryViaOTLP.metrics.enabled = true, prometheus receiver will be removed
+    # prometheus:
+    #   config:
+    #     scrape_configs:
+    #       - job_name: fluent-bit-opentelemetry-collector # create different jobs for different configs
+    #         metrics_path: /api/v2/metrics/prometheus # fluent-bit exposing metrics via separate path with latest metrics on v2 path
+    #         scrape_interval: 60s # for our test just scrape every minute.
+    #         static_configs:
+    #           - targets:
+    #               # - ${env:MY_POD_IP}:8888
+    #               - fluent-bit:2020 # for now only checking fluent-bit metrics
     prometheus:
-      config:
-        scrape_configs:
-          - job_name: fluent-bit-opentelemetry-collector # create different jobs for different configs
-            metrics_path: /api/v2/metrics/prometheus # fluent-bit exposing metrics via separate path with latest metrics on v2 path
-            scrape_interval: 60s # for our test just scrape every minute.
-            static_configs:
-              - targets:
-                  # - ${env:MY_POD_IP}:8888
-                  - fluent-bit:2020 # for now only checking fluent-bit metrics
+    config:
+      scrape_configs:
+        - job_name: "fluent-bit"
+          metrics_path: /api/v2/metrics/prometheus # fluent-bit exposing metrics via separate path with latest metrics on v2 path
+          scrape_interval: 60s # for our test just scrape every minute.
+          kubernetes_sd_configs:
+            - role: pod
+          relabel_configs:
+            # Only keep pods labeled as Fluent Bit
+            - source_labels:
+                [__meta_kubernetes_pod_label_app_kubernetes_io_name]
+              action: keep
+              regex: fluent-bit
+
+            # Only scrape pods on the same node as the collector
+            - source_labels:
+                [__meta_kubernetes_pod_node_name, __meta_kubernetes_node_name]
+              action: keep
+              regex: (.+);$1
+
+            # Set target address to pod IP + Fluent Bit port (2020)
+            - source_labels: [__meta_kubernetes_pod_ip]
+              target_label: __address__
+              replacement: $1:2020
+
+            # 🧹 Clean up the instance label
+            - action: labelmap
+              regex: __meta_kubernetes_pod_label_(.+)
     prometheus/traefik:
       config:
         scrape_configs:
           - job_name: "traefik-pods"
+            scrape_interval: 60s # for our test just scrape every minute.
             kubernetes_sd_configs:
               - role: pod
             relabel_configs:
@@ -198,6 +228,12 @@ config:
                   [__meta_kubernetes_pod_label_app_kubernetes_io_name]
                 regex: traefik
                 action: keep
+
+              # Ensure the pod is running on the same node as the collector
+              - source_labels:
+                  [__meta_kubernetes_pod_node_name, __meta_kubernetes_node_name]
+                action: keep
+                regex: (.+);$1 # Keep only if pod is on the same node
 
               # Keep only pods with metrics port
               - source_labels: [__meta_kubernetes_pod_container_port_number]
