@@ -250,6 +250,15 @@ config:
 
             metrics_path: /metrics
             scheme: http
+    kubeletstats:
+      collection_interval: 10s
+      auth_type: "serviceAccount"
+      endpoint: "${env:K8S_NODE_NAME}:10250"
+      insecure_skip_verify: true
+      metric_groups:
+        - node
+        - pod
+        - container
     zipkin:
       endpoint: ${env:MY_POD_IP}:9411
   service:
