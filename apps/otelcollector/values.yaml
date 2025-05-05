@@ -282,6 +282,7 @@ config:
         receivers:
           - prometheus # prometheus receiver used to collect metrics
           - prometheus/traefik
+          - kubeletstats
         processors:
           - memory_limiter
           - batch
