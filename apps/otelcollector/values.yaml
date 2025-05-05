@@ -186,34 +186,34 @@ config:
     #               # - ${env:MY_POD_IP}:8888
     #               - fluent-bit:2020 # for now only checking fluent-bit metrics
     prometheus:
-    config:
-      scrape_configs:
-        - job_name: "fluent-bit"
-          metrics_path: /api/v2/metrics/prometheus # fluent-bit exposing metrics via separate path with latest metrics on v2 path
-          scrape_interval: 60s # for our test just scrape every minute.
-          kubernetes_sd_configs:
-            - role: pod
-          relabel_configs:
-            # Only keep pods labeled as Fluent Bit
-            - source_labels:
-                [__meta_kubernetes_pod_label_app_kubernetes_io_name]
-              action: keep
-              regex: fluent-bit
+      config:
+        scrape_configs:
+          - job_name: "fluent-bit"
+            metrics_path: /api/v2/metrics/prometheus # fluent-bit exposing metrics via separate path with latest metrics on v2 path
+            scrape_interval: 60s # for our test just scrape every minute.
+            kubernetes_sd_configs:
+              - role: pod
+            relabel_configs:
+              # Only keep pods labeled as Fluent Bit
+              - source_labels:
+                  [__meta_kubernetes_pod_label_app_kubernetes_io_name]
+                action: keep
+                regex: fluent-bit
 
-            # Only scrape pods on the same node as the collector
-            - source_labels:
-                [__meta_kubernetes_pod_node_name, __meta_kubernetes_node_name]
-              action: keep
-              regex: (.+);$1
+              # Only scrape pods on the same node as the collector
+              - source_labels:
+                  [__meta_kubernetes_pod_node_name, __meta_kubernetes_node_name]
+                action: keep
+                regex: (.+);$1
 
-            # Set target address to pod IP + Fluent Bit port (2020)
-            - source_labels: [__meta_kubernetes_pod_ip]
-              target_label: __address__
-              replacement: $1:2020
+              # Set target address to pod IP + Fluent Bit port (2020)
+              - source_labels: [__meta_kubernetes_pod_ip]
+                target_label: __address__
+                replacement: $1:2020
 
-            # 🧹 Clean up the instance label
-            - action: labelmap
-              regex: __meta_kubernetes_pod_label_(.+)
+              # Clean up the instance label
+              - action: labelmap
+                regex: __meta_kubernetes_pod_label_(.+)
     prometheus/traefik:
       config:
         scrape_configs:
