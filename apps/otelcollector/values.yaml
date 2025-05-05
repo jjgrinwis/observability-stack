@@ -6,7 +6,7 @@ nameOverride: ""
 fullnameOverride: "opentelemetry-collector"
 
 # Valid values are "daemonset", "deployment", and "statefulset".
-mode: "deployment"
+mode: "daemonset"
 
 # Specify which namespace should be used to deploy the resources into
 namespaceOverride: ""
