@@ -61,7 +61,7 @@ presets:
   # Best used with mode = daemonset.
   # See https://opentelemetry.io/docs/kubernetes/collector/components/#kubeletstats-receiver for details on the receiver.
   kubeletMetrics:
-    enabled: false
+    enabled: true
   # Configures the collector to collect kubernetes events.
   # Adds the k8sobjects receiver to the logs pipeline
   # and collects kubernetes events by default.
