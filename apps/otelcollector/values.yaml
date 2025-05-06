@@ -254,7 +254,6 @@ config:
       collection_interval: 10s
       auth_type: "serviceAccount"
       insecure_skip_verify: true
-      scheme: http
       metric_groups:
         - node
         - pod
