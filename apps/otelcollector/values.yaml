@@ -230,10 +230,10 @@ config:
                 action: keep
 
               # Ensure the pod is running on the same node as the collector
-              - source_labels:
-                  [__meta_kubernetes_pod_node_name, __meta_kubernetes_node_name]
-                action: keep
-                regex: (.+);$1 # Keep only if pod is on the same node
+              # - source_labels:
+              #     [__meta_kubernetes_pod_node_name, __meta_kubernetes_node_name]
+              #   action: keep
+              #   regex: (.+);$1 # Keep only if pod is on the same node
 
               # Keep only pods with metrics port
               - source_labels: [__meta_kubernetes_pod_container_port_number]
