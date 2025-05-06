@@ -262,8 +262,8 @@ config:
       endpoint: ${env:MY_POD_IP}:9411
   service:
     telemetry:
-      logs:
-        level: "debug"
+      # logs:
+      #   level: "debug"
       metrics:
         # if internalTelemetryViaOTLP.metrics.enabled = true, this address will be removed and an otel go sdk will be configured to emit otlp
         address: ${env:MY_POD_IP}:8888
