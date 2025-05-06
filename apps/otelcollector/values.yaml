@@ -201,10 +201,10 @@ config:
                 regex: fluent-bit
 
               # Only scrape pods on the same node as the collector
-              - source_labels:
-                  [__meta_kubernetes_pod_node_name, __meta_kubernetes_node_name]
-                action: keep
-                regex: (.+);$1
+              # - source_labels:
+              #     [__meta_kubernetes_pod_node_name, __meta_kubernetes_node_name]
+              #   action: keep
+              #   regex: (.+);$1
 
               # Set target address to pod IP + Fluent Bit port (2020)
               - source_labels: [__meta_kubernetes_pod_ip]
