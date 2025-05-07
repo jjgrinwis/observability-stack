@@ -547,7 +547,7 @@ luaScripts:
                 }
             }
             
-            table.insert(span["events"], {time_unix_nano = span["startTimeUnixNano"], name = "error", attributes = event_attributes})
+            table.insert(span["events"], {time_unix_nano = span["endTimeUnixNano"], name = "error", attributes = event_attributes})
         end
         
         -- Add the span to the list
