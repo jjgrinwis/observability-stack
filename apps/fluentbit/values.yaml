@@ -475,7 +475,7 @@ luaScripts:
         })
         table.insert(resourceSpan["resource"]["attributes"], {
             key = "deployment.environment.name",
-            value = { stringValue = "Akamai-tst" }
+            value = { stringValue = "Akamai-prd" }
         })
         
         -- Adding scopeSpans
