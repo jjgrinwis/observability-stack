@@ -380,7 +380,8 @@ luaScripts:
     local allowed_values = {
         ["test.hostname.net"] = true,
         ["test2.hostname.net"] = true,
-        ["api-sandbox.postnl.nl"] = true
+        ["api-sandbox.postnl.nl"] = true,
+        ["api.postnl.nl"] = true
     }
 
     -- our lua script to filter on hostnames we would like to process
