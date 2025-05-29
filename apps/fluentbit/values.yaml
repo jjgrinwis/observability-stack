@@ -437,6 +437,29 @@ luaScripts:
         return str
     end
 
+    -- get origin_rtt from breadcrumbs data
+    -- Extract and return l + k for top-level c=o part
+    -- l being rtt k the request end time
+    function get_origin_rtt(breadcrumbs)
+        if not breadcrumbs or type(breadcrumbs) ~= "string" then
+            return 0
+        end
+
+        local decoded = urldecode(breadcrumbs)
+        local cleaned_input = decoded:gsub("j=%[%[.-%]%],?", "")
+
+        for part in cleaned_input:gmatch("%[(.-)%]") do
+            local c = part:match("c=(%a)")
+            if c == "o" then
+                local l = tonumber(part:match("l=(%d+)") or "0")
+                local k = tonumber(part:match("k=(%d+)") or "0")
+                return l + k
+            end
+        end
+
+        return 0
+    end
+
     -- for whatever reason datastream is stripping the root / from the path, let's fix that.
     function normalize_path(tag, timestamp, record)
         local path = record["reqPath"]
@@ -517,6 +540,9 @@ luaScripts:
         -- table.insert(span["attributes"], { key = "akamai.download_time", value = { intValue = tonumber(record["downloadTime"]) } })
         table.insert(span["attributes"], { key = "akamai.turnaround_time", value = { intValue = tonumber(record["turnAroundTimeMSec"]) } })
         table.insert(span["attributes"], { key = "akamai.transfer_time", value = { intValue = tonumber(record["transferTimeMSec"]) } })
+        -- akamai.rtt is turnaround time on first edge minus origin rtt which includes request end time.
+        table.insert(span["attributes"], { key = "akamai.rtt", value = { intValue = tonumber(record["turnAroundTimeMSec"] or "0") - get_origin_rtt(record["breadcrumbs"]) } })
+
 
         -- Span Events filled with some timers without any attributes.
         -- events have a time associated with the moment when they are added to the Span 
