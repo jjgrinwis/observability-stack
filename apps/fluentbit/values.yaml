@@ -542,7 +542,7 @@ luaScripts:
         table.insert(span["attributes"], { key = "akamai.transfer_time", value = { intValue = tonumber(record["transferTimeMSec"]) } })
         -- akamai.rtt is turnaround time on first edge minus origin rtt which includes request end time.
         table.insert(span["attributes"], { key = "akamai.rtt", value = { intValue = tonumber(record["turnAroundTimeMSec"] or "0") - get_origin_rtt(record["breadcrumbs"]) } })
-        table.insert(span["attributes"], { key = "akamai.origin_rtt", value = { intValue = get_origin_rtt(record["breadcrumbs"]) } })
+        table.insert(span["attributes"], { key = "akamai.origin_turnaround_time", value = { intValue = get_origin_rtt(record["breadcrumbs"]) } })
 
 
 
