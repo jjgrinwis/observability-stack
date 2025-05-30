@@ -273,7 +273,7 @@ config:
       traces:
         exporters:
           # - debug
-          - otlp/honeycomb
+          # - otlp/honeycomb
           - otlphttp/splunk
         processors:
           - memory_limiter
