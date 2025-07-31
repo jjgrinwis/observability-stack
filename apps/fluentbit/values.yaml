@@ -532,6 +532,7 @@ luaScripts:
         table.insert(span["attributes"], { key = "server.address", value = { stringValue = record["reqHost"] } })
         table.insert(span["attributes"], { key = "client.address", value = { stringValue = record["cliIP"]} })
         table.insert(span["attributes"], { key = "url.path", value = { stringValue = record["reqPath"] } })
+        table.insert(span["attributes"], { key = "url.query", value = { stringValue = record["queryStr"] } })
         table.insert(span["attributes"], { key = "http.response.status_code", value = { intValue = tonumber(record["statusCode"]) } })
         table.insert(span["attributes"], { key = "http.response.body.size", value = { intValue = tonumber(record["objSize"]) } })
         table.insert(span["attributes"], { key = "akamai.grn", value = { stringValue = record["grn"] } })
