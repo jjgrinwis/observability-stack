@@ -36,6 +36,7 @@ Fluent Bit is deployed as a **Deployment** (single replica with HPA enabled) and
 - **Forward traces** to OpenTelemetry Collector via OTLP/HTTP on port 4318
 
 #### Key Features:
+
 - Horizontal Pod Autoscaling (1-3 replicas based on CPU usage)
 - Custom Lua processing for Akamai log transformation
 - Converts Akamai DataStream logs to OpenTelemetry traces
@@ -57,6 +58,7 @@ The OpenTelemetry Collector is deployed as a **DaemonSet** and configured to:
   - Grafana Cloud (traces/metrics)
 
 #### Key Features:
+
 - Memory limiter processor (80% limit, 25% spike)
 - Batch processor for efficient exports
 - Health check endpoint on port 13133
@@ -107,8 +109,9 @@ Configure your Akamai DataStream to send logs to Fluent Bit's HTTP endpoint. The
 - `grn`: Global Reference Number
 
 Example custom field format:
+
 ```
-grn:abc123 traceId:1234567890abcdef spanId:fedcba0987654321
+grn:abc123|traceId:1234567890abcdef|spanId:fedcba0987654321
 ```
 
 ## Configuration
@@ -153,10 +156,12 @@ exporters:
 ## Monitoring
 
 ### Metrics
+
 - Fluent Bit exposes metrics on port 2020 at `/api/v1/metrics/prometheus`
 - OpenTelemetry Collector health check available at port 13133
 
 ### Logs
+
 - Fluent Bit logs available via: `kubectl logs -n observability -l app.kubernetes.io/name=fluent-bit`
 - OTEL Collector logs: `kubectl logs -n observability -l app.kubernetes.io/name=opentelemetry-collector`
 
@@ -165,11 +170,13 @@ exporters:
 ### Common Issues
 
 1. **Fluent Bit not receiving data**
+
    - Check ingress/service configuration
    - Verify Akamai DataStream endpoint configuration
    - Check Fluent Bit logs for connection issues
 
 2. **Traces not appearing in backend**
+
    - Verify API keys/tokens are correctly configured
    - Check OpenTelemetry Collector logs for export errors
    - Ensure network connectivity to observability backends
@@ -203,14 +210,15 @@ curl -X POST http://localhost:8888 -d '{"test": "data"}'
 
 ### Data Flow
 
-1. **Akamai DataStream** sends HTTP logs to Fluent Bit (port 8888)
-2. **Fluent Bit** processes logs through Lua pipeline:
+1. **Akamai DataStream** sends HTTP logs to a Traefik Ingress controller
+2. **Ingress** Traefik doing TLS termination and basic auth and forwards it to Fluent Bit (port 8888)
+3. **Fluent Bit** processes logs through Lua pipeline:
    - Filters based on allowed hostnames
    - Extracts trace context (trace_id, span_id)
    - Transforms to OTLP format
    - Batches traces for efficiency
-3. **OpenTelemetry Collector** receives traces via OTLP/HTTP
-4. **Exporters** send data to configured backends:
+4. **OpenTelemetry Collector** receives traces via OTLP/HTTP
+5. **Exporters** send data to configured backends:
    - Honeycomb for distributed tracing
    - Splunk/SignalFx for APM
    - Grafana Cloud for unified observability
@@ -244,6 +252,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Support
 
 For issues and questions:
+
 - Create an issue in this repository
 - Check the [documentation](https://github.com/jjgrinwis/observability-stack)
 
