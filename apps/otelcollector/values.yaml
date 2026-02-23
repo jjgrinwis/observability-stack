@@ -61,7 +61,7 @@ presets:
   # Best used with mode = daemonset.
   # See https://opentelemetry.io/docs/kubernetes/collector/components/#kubeletstats-receiver for details on the receiver.
   kubeletMetrics:
-    enabled: true
+    enabled: false
   # Configures the collector to collect kubernetes events.
   # Adds the k8sobjects receiver to the logs pipeline
   # and collects kubernetes events by default.
@@ -98,8 +98,7 @@ internalTelemetryViaOTLP:
   # The endpoint where the telemetry will be exported
   endpoint: ""
   # Optional headers to configure the exporters
-  headers:
-    []
+  headers: []
     # - name: "x-dest-auth"
     #   value: "some auth key"
   traces:
@@ -250,14 +249,14 @@ config:
 
             metrics_path: /metrics
             scheme: http
-    kubeletstats:
-      collection_interval: 10s
-      auth_type: "serviceAccount"
-      insecure_skip_verify: true
-      metric_groups:
-        - node
-        - pod
-        - container
+    # kubeletstats:
+    #   collection_interval: 10s
+    #   auth_type: "serviceAccount"
+    #   insecure_skip_verify: true
+    #   metric_groups:
+    #     - node
+    #     - pod
+    #     - container
     zipkin:
       endpoint: ${env:MY_POD_IP}:9411
   service:
@@ -284,7 +283,7 @@ config:
         receivers:
           - prometheus # prometheus receiver used to collect metrics
           - prometheus/traefik
-          - kubeletstats
+        # - kubeletstats
         processors:
           - memory_limiter
           - batch
@@ -482,8 +481,7 @@ hostNetwork: false
 
 # Adding entries to Pod /etc/hosts with HostAliases
 # https://kubernetes.io/docs/tasks/network/customize-hosts-file-for-pods/
-hostAliases:
-  []
+hostAliases: []
   # - ip: "1.2.3.4"
   #   hostnames:
   #     - "my.host.com"
@@ -593,8 +591,7 @@ readinessProbe:
 # startup probe configuration
 # Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
 ##
-startupProbe:
-  {}
+startupProbe: {}
   # Number of seconds after the container has started before startup probes are initiated.
   # initialDelaySeconds: 1
   # How often in seconds to perform the probe.
